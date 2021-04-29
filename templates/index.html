@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>IP Grabber</h1>
+<hr>
+
+<label for='uidInput' style='display: block'>Grabber Token:</label>
+<div style='display: flex; align-items: center; margin-bottom: 6px'>
+    <input name='uidInput' id='uidInput' style='margin: 0 0;'>
+    <span id='grabberLink' style='margin-left: 8px;'></span>
+</div>
+
+<button onclick='genGrabber()' style='display: block'>New Link</button><button onclick='saveToken()'>Save Token to localStorage</button><button onclick='localStorage.removeItem("token")'>Clear localStorage</button>
+
+<hr>
+
+<button onclick='loadResults()'>Refresh Results</button>
+
+<table id='results'>
+    <tr>
+        <th><b>IP</b></th>
+        <th><b>Time</b></th>
+        <th><b>User-Agent</b></th>
+    </tr>
+</table>
+
+<script>
+
+$(function() {
+    token = localStorage.getItem('token');
+    if (token) {
+        $('#uidInput').val(token);
+        $('#grabberLink').empty();
+        $('#grabberLink').append($('<a></a>').prop('href', `https://ipgrabber.thescaryonion.repl.co/${token}.png`).text(`https://ipgrabber.thescaryonion.repl.co/${token}.png`));
+        loadResults();
+    }
+})
+
+// https://stackoverflow.com/a/6078873
+function timeConverter(UNIX_timestamp){
+    var a = new Date(UNIX_timestamp * 1000);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var year = a.getFullYear();
+    var month = months[a.getMonth()];
+    var date = a.getDate();
+    var hour = a.getHours();
+    var min = a.getMinutes();
+    var sec = a.getSeconds();
+    var time = date + ' ' + month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+    return time;
+}
+
+function genGrabber() {
+    $.getJSON('/api/create', (res) => {
+        $('#uidInput').val(res['uid']);
+        $('#grabberLink').empty();
+        $('#grabberLink').append($('<a></a>').prop('href', `https://ipgrabber.thescaryonion.repl.co/${res['uid']}.png`).text(`https://ipgrabber.thescaryonion.repl.co/${res['uid']}.png`));
+    })
+}
+
+function loadResults() {
+    $.post('/api/get', {
+        'uid': $('#uidInput').val()
+    }, (res) => {
+        $('#results').empty();
+        $('#results').append($(`<tr>
+        <th><b>IP</b></th>
+        <th><b>Time</b></th>
+        <th><b>User-Agent</b></th>
+    </tr>`));
+
+        for (i in res) {
+            row = res[i];
+            $('#results').append($(`<tr><th>${row['ip']}</th><th>${timeConverter(row['time'])}</th><th>${row['user-agent']}</th></tr>`))
+        }
+
+    }, "json")
+}
+
+function saveToken() {
+    localStorage.setItem('token', $('#uidInput').val());
+}
+
+setInterval(loadResults, 5000);
+
+</script>
+
+{% endblock %}

